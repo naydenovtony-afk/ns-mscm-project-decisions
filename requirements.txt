@@ -1,0 +1,10 @@
+# Python 3.14.0 (deviation from the requested 3.11: not installed; user chose 3.14)
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==2.5.5
+pandas==3.1.1
+scipy==1.18.1
+scikit-learn==1.9.1
+torch==2.15.0+cpu
+matplotlib==3.11.2
+PyYAML==6.0.3
+pytest==9.2.0

@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this code or these results, please cite the paper."
+title: "Neurosymbolic Markovian Causal Models for Project Management Decisions: Encoding Behavioral Biases as Symbolic Constraints"
+authors:
+  - family-names: Naydenov
+    given-names: Toni
+  - family-names: Galabov
+    given-names: Vasil
+date-released: 2026-11-19
+license: MIT
+repository-code: "https://github.com/naydenovtony-afk/ns-mscm-project-decisions"
+type: software
+preferred-citation:
+  type: article
+  title: "Neurosymbolic Markovian Causal Models for Project Management Decisions: Encoding Behavioral Biases as Symbolic Constraints"
+  authors:
+    - family-names: Naydenov
+      given-names: Toni
+    - family-names: Galabov
+      given-names: Vasil
+  year: 2026

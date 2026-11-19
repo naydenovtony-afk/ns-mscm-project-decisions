@@ -1,0 +1,118 @@
+# NS-M-SCM project-decision simulation: design configuration.
+# Every DGP parameter lives here; results/table_dgp_parameters.csv (Table II) is generated from it.
+# Calibrated value(s) are marked "calibrated" with the procedure that produced them.
+
+seeds:
+  truth: 20261117          # ground truth, all scenarios (common random numbers across scenarios)
+  truth_check: 20261118    # second seed for the stability test
+  calibration: 777         # used only to calibrate cost_factor.a0 (never for truth or estimation)
+  tests: 999               # portfolios used by the DGP/M1 tests (not used for any reported result)
+  replications: 100000     # base of per-replication seeds: SeedSequence([replications, scenario, N, r])
+
+truth:
+  n_projects: 200000
+  chunk: 25000
+
+dgp:
+  bac: 1.0                  # budget at completion, every project
+  omega: 0.20               # share of BAC that is time-related cost (planned overhead per month = omega / D)
+  t_max: 120                # months; projects still open are closed at t_max (count reported)
+  gate_pi: {low: 0.20, high: 0.50}   # stage gate tau = first month with pi_t >= g_i, g_i ~ U(low, high) per project
+  size:      {logmean: 0.0, logsd: 0.5}       # size ~ lognormal
+  novelty:   {a: 2.0, b: 2.0}                 # novelty ~ Beta(a, b)
+  experience: {a: 2.0, b: 2.0}                # experience ~ Beta(a, b)
+  duration:  {base: 18.0, size_exp: 0.5, min: 6, max: 48}   # planned months D = clip(round(base * size^size_exp))
+  cost_factor:              # kappa = 1 + delta, log delta = a0 + c_nov (nov-0.5) + c_size log size + c_exp (exp-0.5) + sd z
+    a0: -1.5631                # calibrated (see calibrate.py): E[Y | do(all A = 0)] = 0.28 in S1
+    novelty: 1.0
+    log_size: 0.4
+    experience: -0.4
+    sd: 0.5
+  progress:                 # monthly rate = (1/D) exp(c_nov (nov-0.5) + c_exp (exp-0.5)) * mode_mult * noise
+    novelty: -0.3
+    experience: 0.2
+    noise_sd: 0.30          # log-normal monthly noise with mean 1
+  cost_noise_sd: 0.10       # monthly work-cost noise (1 + e), e ~ N(0, sd), floored at 0.1
+  mode:                     # 0 on_track, 1 at_risk, 2 delayed, 3 critical, 4 completed (absorbing)
+    cost_mult:     [1.00, 1.08, 1.12, 1.30]   # work-cost multiplier (rework) by mode
+    progress_mult: [1.00, 0.92, 0.75, 0.60]   # progress multiplier by mode
+    # ordered logit: P(next <= k) = sigmoid(cut_k - eta),
+    # eta = persistence*mode + cpi (1-CPI) + spi (1-SPI) + novelty (nov-0.5) + experience (exp-0.5) - interventions
+    persistence: 1.0
+    cpi: 4.0
+    spi: 3.0
+    novelty: 0.5
+    experience: -0.5
+    cuts: [2.0, 3.5, 5.0]
+  propensity:               # p = floor + (1 - 2 floor) sigmoid(logit): always within [floor, 1 - floor]
+    floor: 0.03
+    A1: {const: -1.5, cpi: 6.0, at_risk_or_critical: 0.5, novelty: 0.5}            # logit uses (1-CPI)
+    A2: {const: -1.4, cpi: 10.0, b: -15.0, b_center: 0.35}                          # S1: escalation, b lowers P(A2)
+    A3: {const: -1.5, spi: 5.0, log_size: 0.8}                                      # logit uses (1-SPI)
+  effects:                  # active from month tau + 1; no further interventions after tau
+    A1:                     # independent review: cuts the remaining excess cost factor by r1
+      base: 0.15
+      novelty: 0.20
+      mode_bonus: [0.00, 0.10, 0.05, 0.20]
+      transition: 0.5
+    A2:                     # re-planning: cuts the remaining excess cost factor by r2
+      base: 0.10
+      novelty: 0.25
+      mode_bonus: [0.00, 0.05, 0.15, 0.10]
+      transition: 0.7
+    A3:                     # team reinforcement: faster progress, higher monthly time cost, onboarding cost
+      speed_base: 0.30
+      speed_novelty: -0.20
+      team_time_cost: 0.50  # monthly time-related cost x (1 + team_time_cost)
+      onboarding: 0.05      # added to the excess cost factor of remaining work
+      transition: 0.4
+
+scenarios:
+  S1: {}                    # all rules true
+  S2:                       # distribution shift: evaluation portfolio larger and more novel; truth on it
+    shift: {size_logmean: 0.4, novelty_a: 4.0, novelty_b: 2.0}
+  S3:                       # R2 false: P(A2) increases with b at fixed CPI
+    A2_b: 15.0
+  S4:                       # R1 and R2 false
+    A2_b: 15.0
+    r1_false: {threshold: 0.5, slope: 3.2, kappa_floor: 0.5}   # delta x (1 - slope (nov - threshold)_+)
+
+estimators:                 # prompt Section 4; fixed at the design freeze
+  covariates: [mode_on_track, mode_at_risk, mode_delayed, mode_critical, pi, CPI, SPI, b, size, novelty, experience]
+  standardize: within_training_folds   # mean/sd of the K-1 training folds; sd 0 -> 1
+  folds: 5                  # K, random split by project (permutation from the replication seed)
+  propensity_clip: [0.01, 0.99]
+  mlp:                      # same architecture for every nuisance function (M3 and M4)
+    hidden: [32, 32]
+    activation: relu
+    optimizer: adam
+    learning_rate: 0.001
+    weight_decay: 0.0
+    batch_size: 128
+    max_epochs: 300
+    early_stopping_patience: 20        # epochs without improvement of the validation data loss; best weights kept
+    validation_share: 0.20             # of the training folds; used for early stopping (M3, M4) and mu (M4)
+    loss_outcome: mse                  # on raw Y
+    loss_propensity: bce
+    torch_threads: 1
+  ns:                       # M4 = M3 + mu * sum_k mean(relu(c_k)) on training states + perturbed copies
+    mu_grid: [0.1, 1.0, 10.0]
+    mu_selection: validation_data_loss # per fold and nuisance function; never by theta
+    perturbation_sd: 0.10              # one perturbed copy per training state, N(0, sd^2) on standardized continuous inputs
+    derivatives: standardized_inputs   # d/dz (per training-fold sd); sign identical to raw units
+    r2_direction: along_pi_at_fixed_CPI  # d/dpi of e2(pi, CPI, b = pi/CPI) = de2/dpi + (1/CPI) de2/db
+    violation_rate: held_out_fold_states # share of evaluation states with c_k > 0, M3 and M4
+  hgb:                      # M5 (scikit-learn HistGradientBoosting), same folds
+    max_iter: 200
+    learning_rate: 0.05
+    max_leaf_nodes: 31
+    min_samples_leaf: 20
+    early_stopping: false
+  s2:                       # fit on the base portfolio (K-fold training sets as in S1); shifted portfolio of the
+    evaluation: fold_k_models_score_shifted_part_k   # same size split into K parts, part k scored by fold-k models
+
+experiments:
+  N: [300, 1000, 5000]
+  scenarios: [S1, S2, S3, S4]
+  R: {300: 100, 1000: 100, 5000: 50}   # final replications per cell (set after the Step 4 timing; see CHANGELOG.md)
+  R_phase1: 50              # phase 1: every cell to 50; phase 2 (pre-declared): N = 300, 1000 extended to 100

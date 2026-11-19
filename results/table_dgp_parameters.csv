@@ -1,0 +1,66 @@
+block,parameter,value,description
+all scenarios,bac,1.0,Budget at completion (every project)
+all scenarios,omega,0.2,Share of BAC that is time-related cost; planned overhead per month = omega/D
+all scenarios,t_max,120,Maximum months; open projects are closed at t_max
+all scenarios,gate_pi.low,0.2,"Stage gate: first month with pi >= g_i, g_i ~ U(low, high) per project (review schedule): low"
+all scenarios,gate_pi.high,0.5,"Stage gate threshold g_i ~ U(low, high): high"
+all scenarios,size.logmean,0.0,Size ~ lognormal: mean of log size
+all scenarios,size.logsd,0.5,Size ~ lognormal: sd of log size
+all scenarios,novelty.a,2.0,"Novelty ~ Beta(a, b): a"
+all scenarios,novelty.b,2.0,"Novelty ~ Beta(a, b): b"
+all scenarios,experience.a,2.0,"Team experience ~ Beta(a, b): a"
+all scenarios,experience.b,2.0,"Team experience ~ Beta(a, b): b"
+all scenarios,duration.base,18.0,"Planned duration D = clip(round(base * size^size_exp), min, max) months: base"
+all scenarios,duration.size_exp,0.5,Planned duration: exponent of size
+all scenarios,duration.min,6,Planned duration: minimum months
+all scenarios,duration.max,48,Planned duration: maximum months
+all scenarios,cost_factor.a0,-1.5631,"True cost factor kappa = 1 + delta; log delta intercept (calibrated: mean overrun 28% with all A = 0, S1)"
+all scenarios,cost_factor.novelty,1.0,"log delta: coefficient of (novelty - 0.5) (planning fallacy, R1)"
+all scenarios,cost_factor.log_size,0.4,log delta: coefficient of log size (R1)
+all scenarios,cost_factor.experience,-0.4,log delta: coefficient of (experience - 0.5)
+all scenarios,cost_factor.sd,0.5,"log delta: sd of the project-level normal term (latent, unobserved)"
+all scenarios,progress.novelty,-0.3,Monthly progress rate (1/D) exp(...): coefficient of (novelty - 0.5)
+all scenarios,progress.experience,0.2,Monthly progress rate: coefficient of (experience - 0.5)
+all scenarios,progress.noise_sd,0.3,Monthly progress noise: sd of the log-normal multiplier (mean 1)
+all scenarios,cost_noise_sd,0.1,"Monthly work-cost noise: sd of e in (1 + e), floored at 0.1"
+all scenarios,mode.cost_mult,"[1.0, 1.08, 1.12, 1.3]","Work-cost multiplier by mode (on track, at risk, delayed, critical)"
+all scenarios,mode.progress_mult,"[1.0, 0.92, 0.75, 0.6]","Progress multiplier by mode (on track, at risk, delayed, critical)"
+all scenarios,mode.persistence,1.0,Mode transition (ordered logit) eta: coefficient of current mode
+all scenarios,mode.cpi,4.0,Mode transition eta: coefficient of (1 - CPI)
+all scenarios,mode.spi,3.0,Mode transition eta: coefficient of (1 - SPI)
+all scenarios,mode.novelty,0.5,Mode transition eta: coefficient of (novelty - 0.5)
+all scenarios,mode.experience,-0.5,Mode transition eta: coefficient of (experience - 0.5)
+all scenarios,mode.cuts,"[2.0, 3.5, 5.0]",Mode transition cut points: P(next <= k) = sigmoid(cut_k - eta)
+all scenarios,propensity.floor,0.03,Propensities p = floor + (1 - 2 floor) sigmoid(logit) (positivity)
+all scenarios,propensity.A1.const,-1.5,A1 review logit: intercept
+all scenarios,propensity.A1.cpi,6.0,A1 logit: coefficient of (1 - CPI)
+all scenarios,propensity.A1.at_risk_or_critical,0.5,A1 logit: indicator mode at risk or critical
+all scenarios,propensity.A1.novelty,0.5,A1 logit: coefficient of (novelty - 0.5)
+all scenarios,propensity.A2.const,-1.4,A2 re-planning logit: intercept
+all scenarios,propensity.A2.cpi,10.0,A2 logit: coefficient of (1 - CPI)
+all scenarios,propensity.A2.b,-15.0,"A2 logit: coefficient of (b - b_center); negative = escalation of commitment (R2), S1/S2"
+all scenarios,propensity.A2.b_center,0.35,A2 logit: centring of the spent share b
+all scenarios,propensity.A3.const,-1.5,A3 reinforcement logit: intercept
+all scenarios,propensity.A3.spi,5.0,A3 logit: coefficient of (1 - SPI)
+all scenarios,propensity.A3.log_size,0.8,A3 logit: coefficient of log size
+all scenarios,effects.A1.base,0.15,"A1: share of the remaining excess cost factor removed, intercept"
+all scenarios,effects.A1.novelty,0.2,"A1: excess removed, coefficient of novelty"
+all scenarios,effects.A1.mode_bonus,"[0.0, 0.1, 0.05, 0.2]","A1: excess removed, added by mode at tau (on track, at risk, delayed, critical)"
+all scenarios,effects.A1.transition,0.5,A1: reduction of the mode-transition eta after tau
+all scenarios,effects.A2.base,0.1,"A2: share of the remaining excess cost factor removed, intercept"
+all scenarios,effects.A2.novelty,0.25,"A2: excess removed, coefficient of novelty"
+all scenarios,effects.A2.mode_bonus,"[0.0, 0.05, 0.15, 0.1]","A2: excess removed, added by mode at tau"
+all scenarios,effects.A2.transition,0.7,A2: reduction of the mode-transition eta after tau
+all scenarios,effects.A3.speed_base,0.3,"A3: progress speed-up, intercept"
+all scenarios,effects.A3.speed_novelty,-0.2,"A3: progress speed-up, coefficient of novelty"
+all scenarios,effects.A3.team_time_cost,0.5,A3: monthly time-related cost multiplied by (1 + this)
+all scenarios,effects.A3.onboarding,0.05,A3: added to the cost factor of remaining work
+all scenarios,effects.A3.transition,0.4,A3: reduction of the mode-transition eta after tau
+S2,S2.shift.size_logmean,0.4,S2 evaluation portfolio: mean of log size
+S2,S2.shift.novelty_a,4.0,S2 evaluation portfolio: novelty Beta a
+S2,S2.shift.novelty_b,2.0,S2 evaluation portfolio: novelty Beta b
+S3,S3.A2_b,15.0,S3: A2 logit coefficient of b (positive: R2 false)
+S4,S4.A2_b,15.0,S4: A2 logit coefficient of b (positive: R2 false)
+S4,S4.r1_false.threshold,0.5,S4: delta multiplied by 1 - slope (novelty - threshold)_+ : threshold (R1 false)
+S4,S4.r1_false.slope,3.2,S4: slope of that multiplier
+S4,S4.r1_false.kappa_floor,0.5,S4: lower bound of the cost factor kappa

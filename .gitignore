@@ -1,0 +1,16 @@
+.venv/
+.python*/
+__pycache__/
+*.pyc
+.pytest_cache/
+results/raw/*.parquet
+results/cache/
+*.npz
+*.npy
+*.pt
+results/timing/
+results/launcher.pid
+results/sim_run.log
+results/sim_phase*
+launch_sim.ps1
+reference/

@@ -1,0 +1,220 @@
+{
+  "runs": [
+    {
+      "stage": "truth",
+      "quick": false,
+      "started": "2026-11-17T16:15:02",
+      "seconds": 78.2,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "truth_seed": 20261117,
+      "truth_n": 200000,
+      "chunk": 25000,
+      "outputs": [
+        "ground_truth.json",
+        "dgp_summary.json",
+        "table_dgp_parameters.csv"
+      ]
+    },
+    {
+      "stage": "truth",
+      "quick": false,
+      "started": "2026-11-17T16:36:54",
+      "seconds": 177.4,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "truth_seed": 20261117,
+      "truth_n": 200000,
+      "chunk": 25000,
+      "outputs": [
+        "ground_truth.json",
+        "dgp_summary.json",
+        "table_dgp_parameters.csv"
+      ]
+    },
+    {
+      "stage": "truth",
+      "quick": false,
+      "started": "2026-11-17T16:42:12",
+      "seconds": 158.6,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "truth_seed": 20261117,
+      "truth_n": 200000,
+      "chunk": 25000,
+      "outputs": [
+        "ground_truth.json",
+        "dgp_summary.json",
+        "table_dgp_parameters.csv"
+      ]
+    },
+    {
+      "stage": "rulecheck",
+      "quick": false,
+      "started": "2026-11-17T16:50:35",
+      "seconds": 85.0,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "rulecheck_seed": 999,
+      "rulecheck_n": 200000,
+      "outputs": [
+        "dgp_rule_checks.json"
+      ]
+    },
+    {
+      "stage": "simulate",
+      "quick": false,
+      "started": "2026-11-17T18:39:47",
+      "seconds": 912.2,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "replications": 1,
+      "N": [
+        300,
+        1000,
+        5000
+      ],
+      "workers": 6,
+      "outdir": "results/timing",
+      "jobs_run": 12
+    },
+    {
+      "stage": "simulate",
+      "quick": false,
+      "started": "2026-11-17T23:48:34",
+      "seconds": 55838.5,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "replications": {
+        "300": 50,
+        "1000": 50,
+        "5000": 50
+      },
+      "N": [
+        300,
+        1000,
+        5000
+      ],
+      "workers": 4,
+      "outdir": "results/raw",
+      "jobs_run": 552
+    },
+    {
+      "stage": "simulate",
+      "quick": false,
+      "started": "2026-11-18T15:19:37",
+      "seconds": 26913.3,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "replications": {
+        "300": 100,
+        "1000": 100,
+        "5000": 50
+      },
+      "N": [
+        300,
+        1000,
+        5000
+      ],
+      "workers": 4,
+      "outdir": "results/raw",
+      "jobs_run": 400
+    },
+    {
+      "stage": "analyze",
+      "quick": false,
+      "started": "2026-11-18T22:49:09",
+      "seconds": 6.5,
+      "python": "3.14.0",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "numpy": "2.5.5",
+      "seeds": {
+        "truth": 20261117,
+        "truth_check": 20261118,
+        "calibration": 777,
+        "tests": 999,
+        "replications": 100000
+      },
+      "config": "config.yaml",
+      "stages": {
+        "analyze": {
+          "outputs": [
+            "table_main.csv",
+            "table_scenarios.csv",
+            "hypotheses.csv",
+            "table_mu.csv",
+            "table_violations.csv",
+            "m1_bias_200k.csv",
+            "fig_rmse_vs_N.pdf",
+            "fig_rmse_vs_N.png",
+            "fig_coverage.pdf",
+            "fig_coverage.png",
+            "paper_numbers.json",
+            "SUMMARY.md"
+          ]
+        }
+      }
+    }
+  ]
+}
